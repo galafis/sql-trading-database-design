@@ -75,7 +75,7 @@ A **comprehensive database design** for a trading system with optimized schema, 
 
 ```bash
 # Clone the repository
-git clone https://github.com/gabriellafis/sql-trading-database-design.git
+git clone https://github.com/galafis/sql-trading-database-design.git
 cd sql-trading-database-design
 
 # Create database
@@ -447,7 +447,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Gabriel Demetrios Lafis**
 
-- GitHub: [@gabriellafis](https://github.com/gabriellafis)
+- GitHub: [@galafis](https://github.com/galafis)
 - LinkedIn: [Gabriel Demetrios Lafis](https://linkedin.com/in/gabriel-lafis)
 
 ---
@@ -483,7 +483,7 @@ Um **design completo de banco de dados** para sistema de trading com schema otim
 
 ```bash
 # Clone o repositório
-git clone https://github.com/gabriellafis/sql-trading-database-design.git
+git clone https://github.com/galafis/sql-trading-database-design.git
 cd sql-trading-database-design
 
 # Crie o banco de dados
@@ -517,7 +517,7 @@ Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE](LICE
 
 **Gabriel Demetrios Lafis**
 
-- GitHub: [@gabriellafis](https://github.com/gabriellafis)
+- GitHub: [@galafis](https://github.com/galafis)
 - LinkedIn: [Gabriel Demetrios Lafis](https://linkedin.com/in/gabriel-lafis)
 
 ---
