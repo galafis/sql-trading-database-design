@@ -148,3 +148,140 @@ CREATE TRIGGER update_positions_updated_at
     BEFORE UPDATE ON positions
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
+
+
+-- ============================================================================
+-- Audit Trigger Function for Orders
+-- ============================================================================
+CREATE OR REPLACE FUNCTION audit_orders_changes_trigger()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF (TG_OP = 'INSERT') THEN
+        INSERT INTO audit_log (table_name, record_id, operation_type, new_data, changed_by)
+        VALUES (TG_TABLE_NAME, NEW.order_id, TG_OP, to_jsonb(NEW), NEW.account_id); -- Assuming account_id is the user context
+        RETURN NEW;
+    ELSIF (TG_OP = 'UPDATE') THEN
+        INSERT INTO audit_log (table_name, record_id, operation_type, old_data, new_data, changed_by)
+        VALUES (TG_TABLE_NAME, OLD.order_id, TG_OP, to_jsonb(OLD), to_jsonb(NEW), NEW.account_id);
+        RETURN NEW;
+    ELSIF (TG_OP = 'DELETE') THEN
+        INSERT INTO audit_log (table_name, record_id, operation_type, old_data, changed_by)
+        VALUES (TG_TABLE_NAME, OLD.order_id, TG_OP, to_jsonb(OLD), OLD.account_id);
+        RETURN OLD;
+    END IF;
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER audit_orders_changes
+AFTER INSERT OR UPDATE OR DELETE ON orders
+FOR EACH ROW EXECUTE FUNCTION audit_orders_changes_trigger();
+
+-- ============================================================================
+-- Audit Trigger Function for Trades
+-- ============================================================================
+CREATE OR REPLACE FUNCTION audit_trades_changes_trigger()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF (TG_OP = 'INSERT') THEN
+        INSERT INTO audit_log (table_name, record_id, operation_type, new_data, changed_by)
+        VALUES (TG_TABLE_NAME, NEW.trade_id, TG_OP, to_jsonb(NEW), NEW.account_id);
+        RETURN NEW;
+    ELSIF (TG_OP = 'UPDATE') THEN
+        INSERT INTO audit_log (table_name, record_id, operation_type, old_data, new_data, changed_by)
+        VALUES (TG_TABLE_NAME, OLD.trade_id, TG_OP, to_jsonb(OLD), to_jsonb(NEW), NEW.account_id);
+        RETURN NEW;
+    ELSIF (TG_OP = 'DELETE') THEN
+        INSERT INTO audit_log (table_name, record_id, operation_type, old_data, changed_by)
+        VALUES (TG_TABLE_NAME, OLD.trade_id, TG_OP, to_jsonb(OLD), OLD.account_id);
+        RETURN OLD;
+    END IF;
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER audit_trades_changes
+AFTER INSERT OR UPDATE OR DELETE ON trades
+FOR EACH ROW EXECUTE FUNCTION audit_trades_changes_trigger();
+
+-- ============================================================================
+-- Audit Trigger Function for Positions
+-- ============================================================================
+CREATE OR REPLACE FUNCTION audit_positions_changes_trigger()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF (TG_OP = 'INSERT') THEN
+        INSERT INTO audit_log (table_name, record_id, operation_type, new_data, changed_by)
+        VALUES (TG_TABLE_NAME, NEW.position_id, TG_OP, to_jsonb(NEW), NEW.account_id);
+        RETURN NEW;
+    ELSIF (TG_OP = 'UPDATE') THEN
+        INSERT INTO audit_log (table_name, record_id, operation_type, old_data, new_data, changed_by)
+        VALUES (TG_TABLE_NAME, OLD.position_id, TG_OP, to_jsonb(OLD), to_jsonb(NEW), NEW.account_id);
+        RETURN NEW;
+    ELSIF (TG_OP = 'DELETE') THEN
+        INSERT INTO audit_log (table_name, record_id, operation_type, old_data, changed_by)
+        VALUES (TG_TABLE_NAME, OLD.position_id, TG_OP, to_jsonb(OLD), OLD.account_id);
+        RETURN OLD;
+    END IF;
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER audit_positions_changes
+AFTER INSERT OR UPDATE OR DELETE ON positions
+FOR EACH ROW EXECUTE FUNCTION audit_positions_changes_trigger();
+
+-- ============================================================================
+-- Audit Trigger Function for Position History
+-- ============================================================================
+CREATE OR REPLACE FUNCTION audit_position_history_changes_trigger()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF (TG_OP = 'INSERT') THEN
+        INSERT INTO audit_log (table_name, record_id, operation_type, new_data, changed_by)
+        VALUES (TG_TABLE_NAME, NEW.history_id, TG_OP, to_jsonb(NEW), NEW.account_id);
+        RETURN NEW;
+    ELSIF (TG_OP = 'UPDATE') THEN
+        INSERT INTO audit_log (table_name, record_id, operation_type, old_data, new_data, changed_by)
+        VALUES (TG_TABLE_NAME, OLD.history_id, TG_OP, to_jsonb(OLD), to_jsonb(NEW), NEW.account_id);
+        RETURN NEW;
+    ELSIF (TG_OP = 'DELETE') THEN
+        INSERT INTO audit_log (table_name, record_id, operation_type, old_data, changed_by)
+        VALUES (TG_TABLE_NAME, OLD.history_id, TG_OP, to_jsonb(OLD), OLD.account_id);
+        RETURN OLD;
+    END IF;
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER audit_position_history_changes
+AFTER INSERT OR UPDATE OR DELETE ON position_history
+FOR EACH ROW EXECUTE FUNCTION audit_position_history_changes_trigger();
+
+-- ============================================================================
+-- Audit Trigger Function for Transactions
+-- ============================================================================
+CREATE OR REPLACE FUNCTION audit_transactions_changes_trigger()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF (TG_OP = 'INSERT') THEN
+        INSERT INTO audit_log (table_name, record_id, operation_type, new_data, changed_by)
+        VALUES (TG_TABLE_NAME, NEW.transaction_id, TG_OP, to_jsonb(NEW), NEW.account_id);
+        RETURN NEW;
+    ELSIF (TG_OP = 'UPDATE') THEN
+        INSERT INTO audit_log (table_name, record_id, operation_type, old_data, new_data, changed_by)
+        VALUES (TG_TABLE_NAME, OLD.transaction_id, TG_OP, to_jsonb(OLD), to_jsonb(NEW), NEW.account_id);
+        RETURN NEW;
+    ELSIF (TG_OP = 'DELETE') THEN
+        INSERT INTO audit_log (table_name, record_id, operation_type, old_data, changed_by)
+        VALUES (TG_TABLE_NAME, OLD.transaction_id, TG_OP, to_jsonb(OLD), OLD.account_id);
+        RETURN OLD;
+    END IF;
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER audit_transactions_changes
+AFTER INSERT OR UPDATE OR DELETE ON transactions
+FOR EACH ROW EXECUTE FUNCTION audit_transactions_changes_trigger();
+

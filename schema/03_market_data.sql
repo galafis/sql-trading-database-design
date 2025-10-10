@@ -179,3 +179,113 @@ SELECT add_continuous_aggregate_policy('market_data_ohlcv_1d',
     start_offset => INTERVAL '3 days',
     end_offset => INTERVAL '1 day',
     schedule_interval => INTERVAL '1 day');
+
+
+-- ============================================================================
+-- Audit Trigger Function for Market Data OHLCV
+-- ============================================================================
+CREATE OR REPLACE FUNCTION audit_market_data_ohlcv_changes_trigger()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF (TG_OP = 'INSERT') THEN
+        INSERT INTO audit_log (table_name, record_id, operation_type, new_data, changed_by)
+        VALUES (TG_TABLE_NAME, NEW.instrument_id, TG_OP, to_jsonb(NEW), NULL); -- No direct user_id for market data
+        RETURN NEW;
+    ELSIF (TG_OP = 'UPDATE') THEN
+        INSERT INTO audit_log (table_name, record_id, operation_type, old_data, new_data, changed_by)
+        VALUES (TG_TABLE_NAME, OLD.instrument_id, TG_OP, to_jsonb(OLD), to_jsonb(NEW), NULL);
+        RETURN NEW;
+    ELSIF (TG_OP = 'DELETE') THEN
+        INSERT INTO audit_log (table_name, record_id, operation_type, old_data, changed_by)
+        VALUES (TG_TABLE_NAME, OLD.instrument_id, TG_OP, to_jsonb(OLD), NULL);
+        RETURN OLD;
+    END IF;
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER audit_market_data_ohlcv_changes
+AFTER INSERT OR UPDATE OR DELETE ON market_data_ohlcv
+FOR EACH ROW EXECUTE FUNCTION audit_market_data_ohlcv_changes_trigger();
+
+-- ============================================================================
+-- Audit Trigger Function for Market Data Quotes
+-- ============================================================================
+CREATE OR REPLACE FUNCTION audit_market_data_quotes_changes_trigger()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF (TG_OP = 'INSERT') THEN
+        INSERT INTO audit_log (table_name, record_id, operation_type, new_data, changed_by)
+        VALUES (TG_TABLE_NAME, NEW.instrument_id, TG_OP, to_jsonb(NEW), NULL);
+        RETURN NEW;
+    ELSIF (TG_OP = 'UPDATE') THEN
+        INSERT INTO audit_log (table_name, record_id, operation_type, old_data, new_data, changed_by)
+        VALUES (TG_TABLE_NAME, OLD.instrument_id, TG_OP, to_jsonb(OLD), to_jsonb(NEW), NULL);
+        RETURN NEW;
+    ELSIF (TG_OP = 'DELETE') THEN
+        INSERT INTO audit_log (table_name, record_id, operation_type, old_data, changed_by)
+        VALUES (TG_TABLE_NAME, OLD.instrument_id, TG_OP, to_jsonb(OLD), NULL);
+        RETURN OLD;
+    END IF;
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER audit_market_data_quotes_changes
+AFTER INSERT OR UPDATE OR DELETE ON market_data_quotes
+FOR EACH ROW EXECUTE FUNCTION audit_market_data_quotes_changes_trigger();
+
+-- ============================================================================
+-- Audit Trigger Function for Market Data Tickers
+-- ============================================================================
+CREATE OR REPLACE FUNCTION audit_market_data_tickers_changes_trigger()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF (TG_OP = 'INSERT') THEN
+        INSERT INTO audit_log (table_name, record_id, operation_type, new_data, changed_by)
+        VALUES (TG_TABLE_NAME, NEW.instrument_id, TG_OP, to_jsonb(NEW), NULL);
+        RETURN NEW;
+    ELSIF (TG_OP = 'UPDATE') THEN
+        INSERT INTO audit_log (table_name, record_id, operation_type, old_data, new_data, changed_by)
+        VALUES (TG_TABLE_NAME, OLD.instrument_id, TG_OP, to_jsonb(OLD), to_jsonb(NEW), NULL);
+        RETURN NEW;
+    ELSIF (TG_OP = 'DELETE') THEN
+        INSERT INTO audit_log (table_name, record_id, operation_type, old_data, changed_by)
+        VALUES (TG_TABLE_NAME, OLD.instrument_id, TG_OP, to_jsonb(OLD), NULL);
+        RETURN OLD;
+    END IF;
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER audit_market_data_tickers_changes
+AFTER INSERT OR UPDATE OR DELETE ON market_data_tickers
+FOR EACH ROW EXECUTE FUNCTION audit_market_data_tickers_changes_trigger();
+
+-- ============================================================================
+-- Audit Trigger Function for Market Data Trades
+-- ============================================================================
+CREATE OR REPLACE FUNCTION audit_market_data_trades_changes_trigger()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF (TG_OP = 'INSERT') THEN
+        INSERT INTO audit_log (table_name, record_id, operation_type, new_data, changed_by)
+        VALUES (TG_TABLE_NAME, NEW.instrument_id, TG_OP, to_jsonb(NEW), NULL);
+        RETURN NEW;
+    ELSIF (TG_OP = 'UPDATE') THEN
+        INSERT INTO audit_log (table_name, record_id, operation_type, old_data, new_data, changed_by)
+        VALUES (TG_TABLE_NAME, OLD.instrument_id, TG_OP, to_jsonb(OLD), to_jsonb(NEW), NULL);
+        RETURN NEW;
+    ELSIF (TG_OP = 'DELETE') THEN
+        INSERT INTO audit_log (table_name, record_id, operation_type, old_data, changed_by)
+        VALUES (TG_TABLE_NAME, OLD.instrument_id, TG_OP, to_jsonb(OLD), NULL);
+        RETURN OLD;
+    END IF;
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER audit_market_data_trades_changes
+AFTER INSERT OR UPDATE OR DELETE ON market_data_trades
+FOR EACH ROW EXECUTE FUNCTION audit_market_data_trades_changes_trigger();
+

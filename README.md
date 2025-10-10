@@ -1,8 +1,11 @@
 # 🗄️ SQL Trading Database Design
 
+
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15%2B-blue.svg)](https://www.postgresql.org/)
 [![TimescaleDB](https://img.shields.io/badge/TimescaleDB-2.11%2B-orange.svg)](https://www.timescale.com/)
+
 
 [English](#english) | [Português](#português)
 
@@ -332,9 +335,9 @@ SELECT add_retention_policy('market_data_ohlcv', INTERVAL '2 years');
 ```
 sql-trading-database-design/
 ├── schema/
-│   ├── 01_core_tables.sql          # Users, accounts, instruments
-│   ├── 02_trading_tables.sql       # Orders, trades, positions
-│   └── 03_market_data.sql          # OHLCV, quotes, tickers
+│   ├── 01_core_tables.sql          # Users, accounts, instruments, audit_log
+│   ├── 02_trading_tables.sql       # Orders, trades, positions, transactions
+│   └── 03_market_data.sql          # OHLCV, quotes, tickers, market_data_trades
 ├── functions/
 │   ├── position_functions.sql      # Position management
 │   └── pnl_functions.sql           # P&L calculations

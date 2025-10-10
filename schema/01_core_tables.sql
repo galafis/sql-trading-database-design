@@ -144,3 +144,125 @@ CREATE TRIGGER update_instruments_updated_at
     BEFORE UPDATE ON instruments
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
+
+
+-- ============================================================================
+-- Audit Log Table
+-- ============================================================================
+CREATE TABLE audit_log (
+    log_id BIGSERIAL PRIMARY KEY,
+    table_name VARCHAR(100) NOT NULL,
+    record_id BIGINT NOT NULL,
+    operation_type VARCHAR(10) NOT NULL CHECK (operation_type IN (
+        'INSERT', 'UPDATE', 'DELETE'
+    )),
+    old_data JSONB,
+    new_data JSONB,
+    changed_by BIGINT REFERENCES users(user_id),
+    changed_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_audit_log_table_record ON audit_log(table_name, record_id);
+CREATE INDEX idx_audit_log_changed_by ON audit_log(changed_by);
+CREATE INDEX idx_audit_log_changed_at ON audit_log(changed_at DESC);
+
+COMMENT ON TABLE audit_log IS 'Logs of critical operations for auditing purposes';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-- ============================================================================
+-- Audit Trigger Function for Users
+-- ============================================================================
+CREATE OR REPLACE FUNCTION audit_users_changes_trigger()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF (TG_OP = 'INSERT') THEN
+        INSERT INTO audit_log (table_name, record_id, operation_type, new_data, changed_by)
+        VALUES (TG_TABLE_NAME, NEW.user_id, TG_OP, to_jsonb(NEW), NEW.user_id);
+        RETURN NEW;
+    ELSIF (TG_OP = 'UPDATE') THEN
+        INSERT INTO audit_log (table_name, record_id, operation_type, old_data, new_data, changed_by)
+        VALUES (TG_TABLE_NAME, OLD.user_id, TG_OP, to_jsonb(OLD), to_jsonb(NEW), NEW.user_id);
+        RETURN NEW;
+    ELSIF (TG_OP = 'DELETE') THEN
+        INSERT INTO audit_log (table_name, record_id, operation_type, old_data, changed_by)
+        VALUES (TG_TABLE_NAME, OLD.user_id, TG_OP, to_jsonb(OLD), OLD.user_id);
+        RETURN OLD;
+    END IF;
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER audit_users_changes
+AFTER INSERT OR UPDATE OR DELETE ON users
+FOR EACH ROW EXECUTE FUNCTION audit_users_changes_trigger();
+
+-- ============================================================================
+-- Audit Trigger Function for Accounts
+-- ============================================================================
+CREATE OR REPLACE FUNCTION audit_accounts_changes_trigger()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF (TG_OP = 'INSERT') THEN
+        INSERT INTO audit_log (table_name, record_id, operation_type, new_data, changed_by)
+        VALUES (TG_TABLE_NAME, NEW.account_id, TG_OP, to_jsonb(NEW), NEW.user_id);
+        RETURN NEW;
+    ELSIF (TG_OP = 'UPDATE') THEN
+        INSERT INTO audit_log (table_name, record_id, operation_type, old_data, new_data, changed_by)
+        VALUES (TG_TABLE_NAME, OLD.account_id, TG_OP, to_jsonb(OLD), to_jsonb(NEW), NEW.user_id);
+        RETURN NEW;
+    ELSIF (TG_OP = 'DELETE') THEN
+        INSERT INTO audit_log (table_name, record_id, operation_type, old_data, changed_by)
+        VALUES (TG_TABLE_NAME, OLD.account_id, TG_OP, to_jsonb(OLD), OLD.user_id);
+        RETURN OLD;
+    END IF;
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER audit_accounts_changes
+AFTER INSERT OR UPDATE OR DELETE ON accounts
+FOR EACH ROW EXECUTE FUNCTION audit_accounts_changes_trigger();
+
+-- ============================================================================
+-- Audit Trigger Function for Instruments
+-- ============================================================================
+CREATE OR REPLACE FUNCTION audit_instruments_changes_trigger()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF (TG_OP = 'INSERT') THEN
+        INSERT INTO audit_log (table_name, record_id, operation_type, new_data, changed_by)
+        VALUES (TG_TABLE_NAME, NEW.instrument_id, TG_OP, to_jsonb(NEW), NULL); -- No direct user_id for instruments
+        RETURN NEW;
+    ELSIF (TG_OP = 'UPDATE') THEN
+        INSERT INTO audit_log (table_name, record_id, operation_type, old_data, new_data, changed_by)
+        VALUES (TG_TABLE_NAME, OLD.instrument_id, TG_OP, to_jsonb(OLD), to_jsonb(NEW), NULL);
+        RETURN NEW;
+    ELSIF (TG_OP = 'DELETE') THEN
+        INSERT INTO audit_log (table_name, record_id, operation_type, old_data, changed_by)
+        VALUES (TG_TABLE_NAME, OLD.instrument_id, TG_OP, to_jsonb(OLD), NULL);
+        RETURN OLD;
+    END IF;
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER audit_instruments_changes
+AFTER INSERT OR UPDATE OR DELETE ON instruments
+FOR EACH ROW EXECUTE FUNCTION audit_instruments_changes_trigger();
+
