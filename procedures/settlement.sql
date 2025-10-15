@@ -295,21 +295,31 @@ BEGIN
             SET balance = balance + (v_position.quantity * p_ratio)
             WHERE account_id = v_position.account_id;
             
+            -- Get updated balance
+            DECLARE v_new_balance DECIMAL;
+            SELECT balance INTO v_new_balance 
+            FROM accounts 
+            WHERE account_id = v_position.account_id;
+            
             -- Record dividend transaction
             INSERT INTO transactions (
                 account_id,
                 transaction_type,
                 amount,
+                balance_after,
                 currency,
                 reference_id,
+                reference_type,
                 description,
-                executed_at
+                created_at
             ) VALUES (
                 v_position.account_id,
                 'dividend',
                 v_position.quantity * p_ratio,
+                v_new_balance,
                 'USD',
-                v_position.position_id::VARCHAR,
+                v_position.position_id,
+                'position',
                 'Dividend payment for instrument ' || p_instrument_id,
                 p_effective_date
             );
