@@ -51,6 +51,8 @@ CREATE TABLE trades (
     value DECIMAL(20, 8) NOT NULL,
     commission DECIMAL(20, 8) DEFAULT 0.00,
     trade_type VARCHAR(20) DEFAULT 'regular' CHECK (trade_type IN ('regular', 'liquidation', 'settlement')),
+    settlement_status VARCHAR(20) DEFAULT 'pending' CHECK (settlement_status IN ('pending', 'settled', 'failed')),
+    settlement_date TIMESTAMP WITH TIME ZONE,
     executed_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
