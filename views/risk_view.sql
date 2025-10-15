@@ -115,16 +115,6 @@ SELECT
         ELSE p.average_entry_price * 0.98
     END AS suggested_take_profit,
     
-    -- Volatility estimation (simplified)
-    i.volatility AS instrument_volatility,
-    
-    -- VaR estimation (simplified, 95% confidence, 1-day)
-    CASE 
-        WHEN i.volatility IS NOT NULL THEN
-            (p.quantity * p.current_price) * i.volatility * 1.65
-        ELSE NULL
-    END AS value_at_risk_95,
-    
     -- Holding period
     EXTRACT(EPOCH FROM (CURRENT_TIMESTAMP - p.opened_at)) / 3600 AS holding_hours,
     EXTRACT(EPOCH FROM (CURRENT_TIMESTAMP - p.opened_at)) / 86400 AS holding_days,
