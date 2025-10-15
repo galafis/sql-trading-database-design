@@ -102,10 +102,11 @@ jobs:
         env:
           PGPASSWORD: postgres
         run: |
-          for test_file in tests/unit/*.sql; do
-            echo "Running $test_file..."
-            psql -h localhost -U postgres -d trading_db_test -f "$test_file" || echo "Test failed: $test_file"
-          done
+          # Install pg_prove (part of pgTAP)
+          sudo cpan TAP::Parser::SourceHandler::pgTAP
+          
+          # Run tests with pg_prove which properly handles TAP output
+          pg_prove -h localhost -U postgres -d trading_db_test tests/unit/*.sql
       
       - name: Validate schema
         env:
