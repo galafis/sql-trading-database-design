@@ -200,48 +200,50 @@ WITH daily_pnl AS (
         END) AS daily_pnl
     FROM trades t
     GROUP BY t.account_id, DATE_TRUNC('day', t.executed_at)
+),
+pnl_with_cumulative AS (
+    SELECT 
+        a.account_id,
+        a.account_number,
+        d.trade_date,
+        d.daily_pnl,
+        SUM(d.daily_pnl) OVER (
+            PARTITION BY a.account_id 
+            ORDER BY d.trade_date
+        ) AS cumulative_pnl,
+        SUM(CASE WHEN d.daily_pnl > 0 THEN d.daily_pnl ELSE 0 END) OVER (
+            PARTITION BY a.account_id 
+            ORDER BY d.trade_date
+        ) AS cumulative_profit,
+        SUM(CASE WHEN d.daily_pnl < 0 THEN ABS(d.daily_pnl) ELSE 0 END) OVER (
+            PARTITION BY a.account_id 
+            ORDER BY d.trade_date
+        ) AS cumulative_loss
+    FROM accounts a
+    JOIN daily_pnl d ON a.account_id = d.account_id
 )
 SELECT 
-    a.account_id,
-    a.account_number,
-    d.trade_date,
-    d.daily_pnl,
-    SUM(d.daily_pnl) OVER (
-        PARTITION BY a.account_id 
-        ORDER BY d.trade_date
-    ) AS cumulative_pnl,
-    SUM(CASE WHEN d.daily_pnl > 0 THEN d.daily_pnl ELSE 0 END) OVER (
-        PARTITION BY a.account_id 
-        ORDER BY d.trade_date
-    ) AS cumulative_profit,
-    SUM(CASE WHEN d.daily_pnl < 0 THEN ABS(d.daily_pnl) ELSE 0 END) OVER (
-        PARTITION BY a.account_id 
-        ORDER BY d.trade_date
-    ) AS cumulative_loss,
+    account_id,
+    account_number,
+    trade_date,
+    daily_pnl,
+    cumulative_pnl,
+    cumulative_profit,
+    cumulative_loss,
     
-    -- Running maximum
-    MAX(SUM(d.daily_pnl) OVER (
-        PARTITION BY a.account_id 
-        ORDER BY d.trade_date
-    )) OVER (
-        PARTITION BY a.account_id 
-        ORDER BY d.trade_date
+    -- Running maximum (no longer nested)
+    MAX(cumulative_pnl) OVER (
+        PARTITION BY account_id 
+        ORDER BY trade_date
     ) AS running_max_pnl,
     
-    -- Drawdown
-    SUM(d.daily_pnl) OVER (
-        PARTITION BY a.account_id 
-        ORDER BY d.trade_date
-    ) - MAX(SUM(d.daily_pnl) OVER (
-        PARTITION BY a.account_id 
-        ORDER BY d.trade_date
-    )) OVER (
-        PARTITION BY a.account_id 
-        ORDER BY d.trade_date
+    -- Drawdown (no longer nested)
+    cumulative_pnl - MAX(cumulative_pnl) OVER (
+        PARTITION BY account_id 
+        ORDER BY trade_date
     ) AS drawdown
-FROM accounts a
-JOIN daily_pnl d ON a.account_id = d.account_id
-ORDER BY a.account_id, d.trade_date;
+FROM pnl_with_cumulative
+ORDER BY account_id, trade_date;
 
 COMMENT ON VIEW v_cumulative_pnl IS 'Cumulative P&L with drawdown analysis';
 

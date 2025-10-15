@@ -263,6 +263,7 @@ RETURNS INTEGER AS $$
 DECLARE
     v_position RECORD;
     v_affected_count INTEGER := 0;
+    v_new_balance DECIMAL;
 BEGIN
     -- Process stock split or reverse split
     IF p_action_type IN ('split', 'reverse_split') THEN
@@ -296,7 +297,6 @@ BEGIN
             WHERE account_id = v_position.account_id;
             
             -- Get updated balance
-            DECLARE v_new_balance DECIMAL;
             SELECT balance INTO v_new_balance 
             FROM accounts 
             WHERE account_id = v_position.account_id;
