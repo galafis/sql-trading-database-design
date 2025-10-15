@@ -98,8 +98,8 @@ jobs:
           sudo make install
           psql -h localhost -U postgres -d trading_db_test -c "CREATE EXTENSION IF NOT EXISTS pgtap;"
           
-          # Install pg_prove for running TAP tests
-          sudo cpan TAP::Parser::SourceHandler::pgTAP
+          # Install pg_prove for running TAP tests (non-interactive)
+          sudo cpan -T TAP::Parser::SourceHandler::pgTAP
       
       - name: Run unit tests
         env:
