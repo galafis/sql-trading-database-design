@@ -2,9 +2,9 @@
 
 > Professional SQL project implementing Sql Trading Database Design
 
-[![SQL](https://img.shields.io/badge/SQL-Standard-336791.svg)](https://img.shields.io/badge/)
-[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg?logo=docker)](Dockerfile)
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+![License-MIT](https://img.shields.io/badge/License--MIT-yellow?style=for-the-badge)
+
 
 [English](#english) | [Português](#português)
 
